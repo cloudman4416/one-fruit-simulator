@@ -1,6 +1,7 @@
 repeat wait() until game:IsLoaded()
 -- local vars
 local client = game.Players.LocalPlayer
+local savedpos
 local THEremote = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent")
 local tpservice = game:GetService("TeleportService")
 
@@ -30,6 +31,7 @@ local autobuso = false
 local autoken = false
 local autohao = false
 local autoskill = false
+local tpsavedpos = false
 
 -- local args for remotes
 
@@ -569,6 +571,18 @@ end
     end)
 end
 ]]--
+
+function tpsavedposf()
+    tpsavedpos = true
+    task.spawn(function()
+        repeat task.wait()
+            pcall(function()
+                tp(savedpos)
+            end)
+        until not tpsavedpos
+    end)
+end
+
 -- ui lib
 
 local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
@@ -672,6 +686,13 @@ local autoskilltog = farming:AddToggle('auto skill', {
     Tooltip = nil,
 })
 
+local savepos = farming:AddButton('Save Position', function() savedpos = CFrame.new(client.Character.HumanoidRootPart.Position) end)
+
+local autotpsavedpos = farming:AddToggle('tp saved pos', {
+    Text = 'tp to saved position', 
+    Default = false, 
+    Tooltip = nil,
+})
 
 meleeselector:OnChanged(function()
     if meleeselector.Value == 'fighting style' then
@@ -772,6 +793,13 @@ autoskilltog:OnChanged(function()
     end
 end)
 
+autotpsavedpos:OnChanged(function()
+    if autotpsavedpos.Value then
+        tpsavedposf()
+    else
+        tpsavedpos = false
+    end
+end)
 
 -- TELEPORT TAB
 
