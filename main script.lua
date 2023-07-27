@@ -28,7 +28,7 @@ local defencefarm = false
 local gunfarm = false
 local autobuso = false
 local autoken = false
-local autohao
+local autohao = false
 local autoskill = false
 
 -- local args for remotes
@@ -481,8 +481,23 @@ function autokenf()
     end)
 end
 
-function autohao()
-
+function autohaof()
+    autohao = true
+    task.spawn(function()
+        repeat task.wait()
+            local haoarg = {
+                [1] = {
+                    [1] = {
+                        [1] = "\4",
+                        [2] = "HaoHaki",
+                        [3] = "null",
+                        [4] = false
+                    }
+                }
+            }     
+            THEremote:FireServer(unpack(haoarg))
+        until not autohao
+    end)
 end
 
 function autoskillf()
@@ -569,12 +584,13 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     ['Farm'] = Window:AddTab('Farm'), 
-    ['Ui Settings'] = Window:AddTab('Ui Settings')
+    ['Teleport'] = Window:AddTab('Teleport'),
+    ['Misc'] = Window:AddTab('Misc')
 }
 
-local uileftgb = Tabs['Ui Settings']:AddLeftGroupbox('Ui Settings')
+local uileftgb = Tabs['Misc']:AddLeftGroupbox('Misc')
 uileftgb:AddButton('Rejoin', function() tpservice:TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer) end)
-uileftgb:AddButton('Unload', function() Library:Unload() end)
+uileftgb:AddButton('Unload Script', function() Library:Unload() end)
 uileftgb:AddButton('ServerHop (Lowest)', function() serverhop() end)
 
 -- FARMING TAB
@@ -622,6 +638,12 @@ local autobusohaki = farming:AddToggle('auto buso', {
 
 local autokenhaki = farming:AddToggle('auto ken', {
     Text = 'auto activate ken haki', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local autohaotog = farming:AddToggle('auto hao', {
+    Text = 'auto activate hao haki', 
     Default = false, 
     Tooltip = nil,
 })
@@ -713,7 +735,13 @@ autokenhaki:OnChanged(function()
     end
 end)
 
-
+autohaotog:OnChanged(function()
+    if autohaotog.Value then
+        autohaof()
+    else
+        autohao = false
+    end
+end)
 weaponselector:OnChanged(function()
     weaponsforskill = {}
     for i, v in pairs(weaponselector.Value) do
@@ -743,3 +771,11 @@ autoskilltog:OnChanged(function()
         autoskill = false
     end
 end)
+
+
+-- TELEPORT TAB
+
+local teleportgb = Tabs['Teleport']:AddLeftGroupbox('Teleport')
+for i, v in pairs(workspace.__GAME.__SpawnLocations:GetChildren()) do
+    teleportgb:AddButton(v:GetAttribute('IslandName'), function() tp(CFrame.new(v.Position)) end)
+end
