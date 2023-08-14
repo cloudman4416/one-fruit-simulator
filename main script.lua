@@ -591,7 +591,7 @@ local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local Window = Library:CreateWindow({
-    Title = 'one fruit simulator sea 1',
+    Title = 'one fruit simulator',
     Center = true, 
     AutoShow = true, 
 })
