@@ -1,18 +1,6 @@
 repeat wait() until game:IsLoaded()
 local client = game.Players.LocalPlayer
-local nonfruit = {'SukeFruit', 
-                  'BaraFruit',  
-                  'KiloFruit',
-                  'SpinFruit',
-                  'BarrierFruit', 
-                  'LoveFruit', 
-                  'BomuFruit',
-                  'MirrorFruit', 
-                  'LightFruit', 
-                  'MeraFruit',
-                  'SunaFruit',
-                  'SmokeFruit', 
-                  'YamiFruit'}
+local nonfruit = {}
 pcall(function()
 repeat wait() until client.PlayerGui.LoadingGui.Frame.Indicator.Text == 'LOADING COMPLETE'
 wait(1.5)
