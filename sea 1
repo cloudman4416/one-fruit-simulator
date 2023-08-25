@@ -19,19 +19,25 @@ local weaponsforskill = {}
 
 -- toggles
 
-local tpautofarm = false
-local levelfarm = false
-local combatfarm = false
-local swordfarm = false
-local fruitfarm = false
-local defencefarm = false
-local gunfarm = false
-local autobuso = false
-local autoken = false
-local autohao = false
-local autoskill = false
-local tpsavedpos = false
+local levelfarm 
+local combatfarm 
+local swordfarm 
+local fruitfarm
+local defencefarm 
+local gunfarm
+local autobuso
+local autoken
+local autohao
+local autoskill
+local tpsavedpos
 local infgeppo
+local cabidifarm
+local lelepofarm
+local miojofarm
+local monkeyqueenfarm
+local crimsonlegfarm
+local seabeastfarm
+local autobuybuso
 
 -- local args for remotes
 
@@ -116,6 +122,16 @@ local questarg = {
     }
 }
 
+local buyarg = {
+    [1] = {
+        [1] = {
+            [1] = "\3",
+            [2] = "BuyItem",
+            [3] = nil--110
+        }
+    }
+}
+
 -- JOIN
 
 
@@ -144,19 +160,20 @@ local THEremote = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent
 -- VITAL FUNCTIONS
 
 function updtools()
-for i, v in pairs(client.Character:GetChildren()) do
-    if v.ClassName == 'Tool' then
-        for a, b in pairs(v:GetAttributes()) do
-            if b == 'Melee' then
+    for i, v in pairs(client.Character:GetChildren()) do
+        if v.ClassName == 'Tool' then
+            for a, b in pairs(v:GetAttributes()) do
+                if b == 'Melee' then
                 melee = v
-            elseif b == 'Fruit' then
+                elseif b == 'Fruit' then
                 fruit = v
-            elseif b == 'Gun' then
+                elseif b == 'Gun' then
                 gun = v
-            elseif b == 'Sword' then
+                elseif b == 'Sword' then
                 sword = v
-            elseif b == 'Defence' then
+                elseif b == 'Defence' then
                 defence = v
+                end
             end
         end
     end
@@ -178,7 +195,6 @@ for i, v in pairs(client.Backpack:GetChildren()) do
             end
         end
     end
-end
 end
 
 updtools()
@@ -324,6 +340,14 @@ function isquestfinished()
     end
 end
 
+function isbossalive(boss)
+    if boss:GetAttribute('Died') or boss.NpcConfiguration:GetAttribute('Health') == 0 then
+        return false
+    else
+        return true
+    end
+end
+
 -- SCRIPT FUNCTION
 
 function combatfarmf()
@@ -348,7 +372,9 @@ function combatfarmf()
             THEremote:FireServer(unpack(meleeargs))
             end)
         until not combatfarm or fruitfarm or swordfarm
+        pcall(function()
         melee.Parent = client.Backpack
+        end)
     end)
 end
 
@@ -375,7 +401,9 @@ function swordfarmf()
                 THEremote:FireServer(unpack(meleeargs))
                 end)
             until combatfarm or fruitfarm or not swordfarm
+            pcall(function()
             sword.Parent = client.Backpack
+            end)
         end)
     end)
 end
@@ -403,7 +431,9 @@ function fruitfarmf()
                 THEremote:FireServer(unpack(meleeargs))
                 end)
             until combatfarm or not fruitfarm or swordfarm
+            pcall(function()
             fruit.Parent = client.Backpack
+            end)
         end)
     end)
 end
@@ -445,7 +475,9 @@ function gunfarmf()
                 until not gunfarm or not target:IsDescendantOf(workspace)
             end)
         until not gunfarm
+        pcall(function()
         gun.Parent = client.Backpack
+        end) 
     end)
 end
 
@@ -538,50 +570,37 @@ function autoskillf()
     end)
 end
 
-function tpautofarmf()
-    pcall(function()
-        task.spawn(function()
-            tpautofarm = true
-            levelfarm = false
-            repeat task.wait()
-                repeat task.wait()
-                    local target = getclosestmob()
-                    tp(target.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, 25, 0))
-                until not target:IsDescendantOf(workspace) or not tpautofarm or levelfarm
-            until not tpautofarm or levelfarm
-        end)
-    end)
-end
-
 function levelfarmf()
     task.spawn(function()
         levelfarm = true
-        tpautofarm = false
+        local bodyvelo = Instance.new('BodyVelocity')
+        bodyvelo.Velocity = Vector3.new(0, 0, 0)
+        bodyvelo.Parent = client.Character.HumanoidRootPart
         repeat task.wait()
-            local quest = getbestquest()
-            tp(quest:GetModelCFrame())
-            if isquestfinished() or client.leaderstats.Currents:GetAttribute('Quest') ~= quest:GetAttribute('QuestID') then
-                questarg[1][1][3] = quest:GetAttribute('QuestID')
+                local quest = getbestquest()
+                tp(quest:GetModelCFrame())
+                if isquestfinished() or client.leaderstats.Currents:GetAttribute('Quest') ~= quest:GetAttribute('QuestID') then
+                    questarg[1][1][3] = quest:GetAttribute('QuestID')
+                    repeat task.wait()
+                    until quest:IsDescendantOf(workspace)
+                    THEremote:FireServer(unpack(questarg))
+                    task.wait(0.3)
+                end
                 repeat task.wait()
-                until quest:IsDescendantOf(workspace)
-                task.wait(0.1)
-                THEremote:FireServer(unpack(questarg))
-            end
-            repeat task.wait()
-                pcall(function()
-                    for i, v in pairs(getisland():GetChildren()) do
-                        if tonumber(v.NpcConfiguration:GetAttribute('QuestId')) == client.leaderstats.Currents:GetAttribute('Quest') and v.NpcConfiguration:GetAttribute('Health') ~= 0 and not isquestfinished() then
-                            repeat task.wait()
-                                tp(v.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, 25, 0))
-                            until v.NpcConfiguration:GetAttribute('Health') == 0 or not v:IsDescendantOf(workspace) or not levelfarm or tpautofarm or isquestfinished()
+                    pcall(function()
+                        for i, v in pairs(getisland():GetChildren()) do
+                            if tonumber(v.NpcConfiguration:GetAttribute('QuestId')) == client.leaderstats.Currents:GetAttribute('Quest') and v.NpcConfiguration:GetAttribute('Health') ~= 0 and not isquestfinished() then
+                                repeat task.wait()
+                                    tp(v.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, v.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                                until v.NpcConfiguration:GetAttribute('Health') == 0 or not v:IsDescendantOf(workspace) or not levelfarm or isquestfinished()
+                            end
                         end
-                    end
-                end)
-            until isquestfinished() or not levelfarm or tpautofarm 
-        until not levelfarm or tpautofarm
+                    end)
+                until isquestfinished() or not levelfarm or getbestquest() ~= quest
+        until not levelfarm
+        bodyvelo.Parent = nil
     end)
 end
-
 
 function tpsavedposf()
     tpsavedpos = true
@@ -595,11 +614,105 @@ function tpsavedposf()
 end
 
 function infgeppof()
+    infgeppo = true
     task.spawn(function()
-        infgeppo = true
         repeat task.wait(1)
             client.Character:SetAttribute('Geppos', math.huge)
         until not infgeppo
+    end)
+end
+
+function cabidifarmf()
+    cabidifarm = true
+    local scboss = workspace.__GAME.__Mobs.__Secrets.Cabidi1
+    task.spawn(function()
+        repeat task.wait(0.1)
+            if isbossalive(scboss) then  
+                repeat task.wait()
+                        tp(scboss.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, scboss.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                until not isbossalive(scboss) or not cabidifarm
+            end
+        until not cabidifarm
+    end)
+end
+
+function lelepofarmf()
+    lelepofarm = true
+    local scboss = workspace.__GAME.__Mobs.__Secrets.Lelepo1
+    task.spawn(function()
+        repeat task.wait(0.1)
+            if isbossalive(scboss) then  
+                repeat task.wait()
+                        tp(scboss.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, scboss.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                until not isbossalive(scboss) or not lelepofarm
+            end
+        until not lelepofarm
+    end)
+end
+
+function miojofarmf()
+    miojofarm = true
+    local scboss = workspace.__GAME.__Mobs.__Secrets.Miojo1 
+    task.spawn(function()
+        repeat task.wait(0.1)
+            if isbossalive(scboss) then  
+                repeat task.wait()
+                        tp(scboss.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, scboss.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                until not isbossalive(scboss) or not miojofarm
+            end
+        until not miojofarm
+    end)
+end
+
+function monkeyqueenfarmf()
+    monkeyqueenfarm = true
+    local scboss = workspace.__GAME.__Mobs.__Secrets.MonkeyQueen1
+    task.spawn(function()
+        repeat task.wait(0.1)
+            if isbossalive(scboss) then  
+                repeat task.wait()
+                        tp(scboss.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, scboss.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                until not isbossalive(scboss) or not monkeyqueenfarm
+            end
+        until not monkeyqueenfarm
+    end)
+end
+
+function crimsonlegfarmf()
+    crimsonlegfarm = true
+    local scboss = workspace.__GAME.__Mobs.__Secrets.Zeff1
+    task.spawn(function()
+        repeat task.wait(0.1)
+            if isbossalive(scboss) then  
+                repeat task.wait()
+                        tp(scboss.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, scboss.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                until not isbossalive(scboss) or not crimsonlegfarm
+            end
+        until not crimsonlegfarm
+    end)
+end
+
+function seabeastfarmf()
+    seabeastfarm = true
+    task.spawn(function()
+        repeat task.wait(0.1)
+            pcall(function()
+                for i, v in pairs(workspace.__GAME.__Mobs.__SeaBeast:GetChildren()) do
+                    if isbossalive(v) then
+                        repeat task.wait()
+                            tp(v.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, v.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                        until not isbossalive(v) or not seabeastfarm
+                    end
+                end
+            end)
+        until not seabeastfarm
+    end)
+end
+
+function buybuso()
+    autobuybuso = true
+    task.spawn(function()
+        
     end)
 end
 
@@ -708,18 +821,53 @@ local autotpsavedpos = farmingsettingsgb:AddToggle('tp saved pos', {
     Tooltip = nil,
 })
 
-local farminggb = Tabs['Farm']:AddLeftGroupbox('autofarm mode') 
-
-local tpfarm = farminggb:AddToggle('tp farm', {
-    Text = 'tp farm', 
-    Default = false, 
-    Tooltip = 'tp above nearest ennemy',
-})
+local farminggb = Tabs['Farm']:AddLeftGroupbox('main farm') 
 
 local levelfarmtog = farminggb:AddToggle('levelfarm', {
     Text = 'auto quest + kill mobs', 
     Default = false, 
     Tooltip = 'use in combination with any farm method above',
+})
+
+local farminggb2 = Tabs['Farm']:AddLeftGroupbox('secondary farm') 
+
+local sbfarmtoggle = farminggb2:AddToggle('sea beast farm', {
+    Text = 'sea beast farm', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local cabidifarmtog = farminggb2:AddToggle('cabidi farm', {
+    Text = 'cabidifarm', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local lelepofarmtog = farminggb2:AddToggle('lelepo farm', {
+    Text = 'lelepo farm', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+
+local miojofarmtog = farminggb2:AddToggle('miojo farm', {
+    Text = 'miojo farm', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+
+local monkeyqueenfarmtog = farminggb2:AddToggle('monkey queen farm', {
+    Text = 'monkey queen farm', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+
+local crimsonlegfarmtog = farminggb2:AddToggle('crimson leg farm', {
+    Text = 'crimson leg farm', 
+    Default = false, 
+    Tooltip = nil,
 })
 
 
@@ -750,14 +898,6 @@ guntoggle:OnChanged(function()
         gunfarmf()
     else 
         gunfarm = false
-    end
-end)
-
-tpfarm:OnChanged(function()
-    if tpfarm.Value then
-        tpautofarmf()
-    else
-        tpautofarm = false
     end
 end)
 
@@ -830,12 +970,67 @@ autotpsavedpos:OnChanged(function()
     end
 end)
 
+sbfarmtoggle:OnChanged(function() 
+    if sbfarmtoggle.Value then
+        seabeastfarmf()
+    else 
+        seabeastfarm = false
+    end
+end)
+
+cabidifarmtog:OnChanged(function() 
+    if cabidifarmtog.Value then
+        cabidifarmf()
+    else 
+        cabidifarm = false
+    end
+end)
+
+lelepofarmtog:OnChanged(function() 
+    if lelepofarmtog.Value then
+        lelepofarmf()
+    else 
+        lelepofarm = false
+    end
+end)
+
+miojofarmtog:OnChanged(function() 
+    if miojofarmtog.Value then
+        miojofarmf()
+    else 
+        miojofarm = false
+    end
+end)
+
+monkeyqueenfarmtog:OnChanged(function() 
+    if monkeyqueenfarmtog.Value then
+        monkeyqueenfarmf()
+    else 
+        monkeyqueenfarm = false
+    end
+end)
+
+crimsonlegfarmtog:OnChanged(function() 
+    if crimsonlegfarmtog.Value then
+        crimsonlegfarmf()
+    else 
+        crimsonlegfarm = false
+    end
+end)
+
+
 -- TELEPORT TAB
 
 local teleportgb = Tabs['Teleport']:AddLeftGroupbox('Teleport')
 for i, v in pairs(workspace.__GAME.__SpawnLocations:GetChildren()) do
     teleportgb:AddButton(v:GetAttribute('IslandName'), function() tp(CFrame.new(v.Position)) end)
 end
+
+local worlgb = Tabs['Teleport']:AddLeftGroupbox('worl changer')
+
+worlgb:AddButton('sea 2', function() buyarg[1][1][3] = 110 
+                                     THEremote:FireServer(unpack(buyarg)) end)
+
 
 -- UTILITY TAB
 
