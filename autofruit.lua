@@ -1,37 +1,4 @@
 repeat wait() until game:IsLoaded()
-getgenv().webhook = "https://discord.com/api/webhooks/1141131986249986118/Crd-Q706FgZ0PrYmXq2UKgVsJZdEWcGbFAYdkz24f7UHeUbcCKvRtGNXijRMh9QclSLU" -- your WebHook goes here
-getgenv().skipfruit =   {		-- put '--' in front of the fruit you want to collect
-                        'BaraFruit',
-                        'BarrierFruit',
-                        'BomuFruit',
-                        --'DragonFruit',
-                        'GomuFruit',
-                        'GoroFruit', 
-                        --'GuraFruit',
-                        'HieFruit',
-                        'ItoFruit',
-                        'KiloFruit',
-                        'LightFruit',
-                        'LoveFruit',
-                        'MagmaFruit',
-                        'MeraFruit',
-                        'MirrorFruit',
-                        --'MochiFruit',
-                        --'OpeFruit',
-                        'PawFruit',
-                        'ShadowFruit',
-                        'SlipFruit',
-                        'SmokeFruit',
-                        --'SoundFruit',
-                        'SpinFruit',
-                        'SpringFruit',
-                        'SukeFruit',
-			            'SunaFruit',
-                        --'VampireFruit',
-                        'YamiFruit',
-                        'YukiFruit',
-                        'ZuchiFrut',
-                        '',}
 local client = game.Players.LocalPlayer
 local HTTPService = game:GetService("HttpService")
 pcall(function()
