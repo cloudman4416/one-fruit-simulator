@@ -1,0 +1,1139 @@
+repeat wait() until game:IsLoaded()
+-- local vars
+local client = game.Players.LocalPlayer
+local game_metatable = getrawmetatable(game) -- the universal metatable used by all Instance userdata
+local namecall_original = game_metatable.__namecall -- the original __namecall method that we will be using inside our hook
+setreadonly(game_metatable, false) -- allows us to modify the game's metatable
+local savedpos
+local invloggerwebhook
+local tpservice = game:GetService("TeleportService")
+local vim = game:GetService('VirtualInputManager')
+function m1click() 
+    vim:SendMouseButtonEvent(0,0,0,true,game,0)
+    wait()
+    vim:SendMouseButtonEvent(0,0,0,false,game,0)
+end
+function pressKey(key)
+    vim:SendKeyEvent(true, key, false, game)
+    vim:SendKeyEvent(false, key, false, game)
+end
+
+-- local weapons
+
+local melee
+local fruit
+local gun
+local sword
+local defence
+
+-- local tables
+
+local skills = {}
+local weaponsforskill = {}
+local skipc = {
+    'Ope',
+    'Rokushiki'
+}
+local skipskill = {
+    'C',
+    'F'
+}
+
+local dodge = {
+    'Down',
+    'Exp',
+    'Exp2',
+    'PreExp',
+    'Ras',
+    'Res'
+}
+
+-- toggles
+
+local levelfarm 
+local combatfarm 
+local swordfarm 
+local fruitfarm 
+local defencefarm 
+local gunfarm 
+local autobuso 
+local autoken 
+local autohao
+local autoskill 
+local tpsavedpos 
+local infgeppo
+local sogekingfarm
+local bazookamanfarm
+local randomfruit
+local seabeastfarm
+local autostore
+local lightraidfarm
+local autoroom
+
+-- local args for remotes
+
+local meleeargs = {
+    [1] = {
+        [1] = {
+            [1] = "\4",
+            [2] = "Combat",
+            [3] = 1,
+            [4] = false,
+            [5] = nil,
+            [6] = nil
+        },
+        [2] = {
+            [1] = "\t",
+            [2] = nil,
+            [3] = nil
+        }
+    }
+}
+
+local gunargs = {
+    [1] = {
+        [1] = {
+            [1] = "\4",
+            [2] = "GunCombat",
+            [3] = {
+                [1] = nil,
+                [2] = Vector3.new(nil)
+            },
+            [4] = false,
+            [5] = nil,
+            [6] = "Gun"
+        }
+    }
+}
+
+local defenceargs = {
+    [1] = {
+        [1] = {
+            [1] = "\4",
+            [2] = "Defence",
+            [3] = nil,
+            [4] = "Defence"
+        }
+    }
+}
+
+local skillarg1 = {
+    [1] = {
+        [1] = {
+            [1] = "\4",
+            [2] = "skillsControl",
+            [3] = nil,
+            [4] = nil,
+            [5] = "Hold",
+            [6] = nil
+        }
+    }
+}
+
+local skillarg2 = {
+    [1] = {
+        [1] = {
+            [1] = "\4",
+            [2] = "skillsControl",
+            [3] = nil,
+            [4] = nil,
+            [5] = "Release",
+            [6] = nil
+        }
+    }
+}
+
+local questarg = {
+    [1] = {
+        [1] = {
+            [1] = "\3",
+            [2] = "GetQuest",
+            [3] = nil
+        }
+    }
+}
+
+-- buyitem args
+
+local sea1arg = {
+    [1] = {
+        [1] = {
+            [1] = "\3",
+            [2] = "BuyItem",
+            [3] = 111
+        }
+    }
+}
+
+local raidarg = {
+    [1] = {
+        [1] = {
+            [1] = "\3",
+            [2] = "BuyItem",
+            [3] = 459
+        }
+    }
+}
+
+
+
+local rfruitarg = {
+    [1] = {
+        [1] = {
+            [1] = "\3",
+            [2] = "RandomFruit"
+        }
+    }
+}
+
+
+
+-- JOIN
+
+task.spawn(function()
+    pcall(function()
+        repeat wait() until client.PlayerGui.LoadingGui.Frame.Indicator.Text == 'LOADING COMPLETE'
+        wait(1.5)
+        for i, v in pairs(getgc()) do
+            if getinfo(v).name == 'Play' then
+                v()
+            end
+        end
+    end)
+end)
+
+local GC = getconnections or get_signal_cons
+	if GC then
+		for i,v in pairs(GC(client.Idled)) do
+			if v["Disable"] then
+				v["Disable"](v)
+			elseif v["Disconnect"] then
+				v["Disconnect"](v)
+			end
+		end
+	else
+		Players.LocalPlayer.Idled:Connect(function()
+			local VirtualUser = game:GetService("VirtualUser")
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton2(Vector2.new())
+		end)
+	end
+
+warn('anti idle activated')
+
+
+client.CharacterAdded:Connect(function()
+    task.spawn(function()
+        task.wait(1.5)
+        client.Character:WaitForChild('Humanoid'):UnequipTools()
+    end)
+end)
+
+client:WaitForChild('leaderstats')
+local level = client.leaderstats.Level.Value
+local questfile = workspace.__GAME.__Quests
+local unloadin = game:GetService("ReplicatedStorage").Game.__UnloadsIn
+local THEremote = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent")
+
+-- VITAL FUNCTIONS
+
+task.spawn(function()
+    while task.wait() do
+        for i, v in pairs(client.Character:GetChildren()) do
+            if v.ClassName == 'Tool' then
+                for a, b in pairs(v:GetAttributes()) do
+                    if b == 'Melee' then
+                        melee = v
+                    elseif b == 'Fruit' then
+                        fruit = v
+                    elseif b == 'Gun' then
+                        gun = v
+                    elseif b == 'Sword' then
+                        sword = v
+                    elseif b == 'Defence' then
+                        defence = v
+                    end
+                end
+            end
+        end
+
+        for i, v in pairs(client.Backpack:GetChildren()) do
+            if v.ClassName == 'Tool' then
+                for a, b in pairs(v:GetAttributes()) do
+                    if b == 'Melee' then
+                        melee = v
+                    elseif b == 'Fruit' then
+                        fruit = v
+                    elseif b == 'Gun' then
+                        gun = v
+                    elseif b == 'Sword' then
+                        sword = v
+                    elseif b == 'Defence' then
+                        defence = v
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
+
+function checkdistance(obj)
+    local dist
+        pcall(function()
+        dist = (obj.Position - client.Character.HumanoidRootPart.Position).Magnitude
+        end)
+    return dist
+end
+
+function getclosestmob()
+    local closest
+    pcall(function()
+        for i, v in pairs(workspace.__GAME.__Mobs:GetDescendants()) do
+            if v:FindFirstChild('NpcModel') then
+                if closest == nil then
+                    closest = v
+                else
+                    if checkdistance(CFrame.new(v.NpcModel.HumanoidRootPart.Position)) < checkdistance(CFrame.new(closest.NpcModel.HumanoidRootPart.Position)) then
+                        closest = v
+                    end
+                end
+            end
+        end
+    end)
+    return closest
+end
+
+function tp(p1)
+    pcall(function()
+        client.Character.HumanoidRootPart.CFrame = p1
+    end)
+end
+
+function getisland()
+    local island
+    for i, v in pairs(workspace.__GAME.__Mobs:GetChildren()) do
+        if string.find(v.Name, 'Ilha') then
+            island = v
+        end
+    end
+    if island ~= nil then
+    return island
+    end
+end
+
+
+function getbestquest()
+    local questid
+    local questdude
+    if level < 8250 then
+        questid = 'Quest82'
+    elseif level < 8500 then
+        questid = 'Quest83'
+    elseif level < 9000 then
+        questid = 'Quest84'
+    elseif level < 9250 then
+        questid = 'Quest85'
+    elseif level < 9500 then
+        questid = 'Quest86'
+    elseif level < 9750 then
+        questid = 'Quest87'
+    elseif level < 10000 then
+        questid = 'Quest88'
+    elseif level < 10250 then
+        questid = 'Quest89'
+    elseif level < 10500 then
+        questid = 'Quest90'
+    elseif level < 10750 then
+        questid = 'Quest91'
+    elseif level < 11000 then
+        questid = 'Quest92'
+    elseif level < 11500 then
+        questid = 'Quest93'
+    elseif level < 12000 then
+        questid = 'Quest94'
+    elseif level < 12500 then
+        questid = 'Quest95'
+    elseif level < 12750 then
+        questid = 'Quest96'
+    elseif level < 13000 then
+        questid = 'Quest97'
+    elseif level < 13250 then
+        questid = 'Quest98'
+    elseif level < 13500 then
+        questid = 'Quest99'
+    elseif level < 14000 then
+        questid = 'Quest100'
+    elseif level < 14500 then
+        questid = 'Quest101'
+    elseif level < 15000 then
+        questid = 'Quest102'
+    elseif level < 15750 then
+        questid = 'Quest103'
+    elseif level < 16500 then
+        questid = 'Quest104'
+    elseif level < 17000 then
+        questid = 'Quest105'
+    elseif level < 17500 then
+        questid = 'Quest106'
+    else 
+        questid = 'Quest107'
+    end
+    questdude = questfile:FindFirstChild(questid)
+    if questdude == nil then
+        questdude = unloadin:FindFirstChild(questid)
+    end
+    return questdude
+end
+
+function serverhop()
+    local Http = game:GetService("HttpService")
+    local TPS = game:GetService("TeleportService")
+    local Api = "https://games.roblox.com/v1/games/"
+
+    local _place = game.PlaceId
+    local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+    function ListServers(cursor)
+    local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+    return Http:JSONDecode(Raw)
+    end
+
+    local Server, Next; repeat
+    local Servers = ListServers(Next)
+    Server = Servers.data[1]
+    Next = Servers.nextPageCursor
+    until Server
+    TPS:TeleportToPlaceInstance(_place,Server.id,game.Players.LocalPlayer)
+
+end
+
+function isquestfinished()
+    if client.leaderstats:GetAttribute('QuestCurrentGoal') == client.leaderstats:GetAttribute('QuestGoal') then
+        return true
+    else
+        return false
+    end
+end
+
+function isnpcalive(boss)
+    if boss:GetAttribute('Died') or boss.NpcConfiguration:GetAttribute('Health') == 0 then
+        return false
+    else
+        return true
+    end
+end
+
+local timer = math.huge
+local secretalive = false
+local aliveboss
+local finaldisplay
+
+task.spawn(function()
+    while task.wait(1) do
+        for i, v in pairs(workspace.__GAME.__Mobs.__Secrets:GetChildren()) do
+            if isnpcalive(v) then
+                secretalive = true
+                aliveboss = v
+            else
+                if v:GetAttribute('LastMove') then
+                local time
+                time = tick() - v:GetAttribute('LastMove') - 3600
+                    if time < timer then
+                        timer = time
+                    end
+                end
+            end
+        end
+
+        if secretalive then
+            finaldisplay = aliveboss.Name .. ' is alive'
+        else 
+            if timer == math.huge then
+                finaldisplay = 'next secret boss in under 10 minutes'
+            else
+                finaldisplay = 'next secret boss in ' .. math.ceil(600 - timer)
+            end
+        end
+    end
+end)
+
+function webhook(message, webhook)
+    task.spawn(function()
+        request({
+            Url = webhook,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = game.HttpService:JSONEncode({
+                content = message
+           })
+        })
+    end)
+end
+
+task.spawn(function()
+    local inventory = client.leaderstats.Inventory
+    local oldatt = inventory:GetAttributes()
+
+    inventory.AttributeChanged:Connect(function(attributeName)
+        for i, v in pairs(oldatt) do
+            if i == attributeName then
+                if v < inventory:GetAttribute(attributeName) then
+                    webhook('>>> ||' .. client.Name .. '|| got ' .. i .. ', now have ' .. tostring(inventory:GetAttribute(attributeName)), invloggerwebhook)
+                end
+            end
+        end
+        oldatt = inventory:GetAttributes()
+    end)
+end)
+
+--[[game_metatable.__namecall = newcclosure(function(self, ...) -- the actual metatable hook
+    local method = getnamecallmethod() -- gets the method name (as a string)
+    local script = getcallingscript()
+    local args = ...
+    if method == 'FireServer' then
+        if args[1][2] == 'skillsControl' then
+            if autoskill then
+                args[1][6] = getclosestmob().NpcModel.HumanoidRootPart.Position
+                return namecall_original(self, args)
+            end
+        end -- gets the script that fired the method (as an instance)
+    end
+    return namecall_original(self, ...) -- calls and returns the original namecall so roblox doesn't commit self die
+end)]]--
+
+-- SCRIPT FUNCTION
+
+function combatfarmf()
+    task.spawn(function()
+        combatfarm = true
+        swordfarm = false
+        fruitfarm = false
+        local target = getclosestmob()
+        meleeargs[1][1][5] = melee
+        meleeargs[1][1][6] = 'Melee'
+        meleeargs[1][2][3] = melee
+        meleeargs[1][2][2] = target
+        repeat task.wait()
+            pcall(function()
+            local target = getclosestmob()
+            meleeargs[1][1][5] = melee
+            meleeargs[1][2][3] = melee
+            meleeargs[1][2][2] = target
+            melee.Parent = client.Character
+            THEremote:FireServer(unpack(meleeargs))
+            end)
+        until not combatfarm or fruitfarm or swordfarm
+        melee.Parent = client.Backpack
+    end)
+end
+
+function swordfarmf()
+    pcall(function()
+        task.spawn(function()
+            swordfarm = true
+            combatfarm = false
+            fruitfarm = false
+            local target = getclosestmob()
+            meleeargs[1][1][5] = sword
+            meleeargs[1][1][6] = 'Sword'
+            meleeargs[1][2][3] = sword
+            meleeargs[1][2][2] = target
+            repeat task.wait()
+                pcall(function()
+                local target = getclosestmob()
+                meleeargs[1][1][5] = sword
+                meleeargs[1][2][3] = sword
+                meleeargs[1][2][2] = target
+                sword.Parent = client.Character
+                THEremote:FireServer(unpack(meleeargs))
+                end)
+            until combatfarm or fruitfarm or not swordfarm
+            sword.Parent = client.Backpack
+        end)
+    end)
+end
+
+function fruitfarmf()
+    pcall(function()
+        task.spawn(function()
+            fruitfarm = true
+            combatfarm = false
+            swordfarm = false
+            local target = getclosestmob()
+            meleeargs[1][1][5] = fruit
+            meleeargs[1][1][6] = 'Fruit'
+            meleeargs[1][2][3] = fruit
+            meleeargs[1][2][2] = target
+            repeat task.wait()
+                pcall(function()
+                local target = getclosestmob()
+                meleeargs[1][1][5] = fruit
+                meleeargs[1][2][3] = fruit
+                meleeargs[1][2][2] = target
+                fruit.Parent = client.Character
+                THEremote:FireServer(unpack(meleeargs))
+                end)
+            until combatfarm or not fruitfarm or swordfarm
+            fruit.Parent = client.Backpack
+        end)
+    end)
+end
+
+function defencefarmf()
+    task.spawn(function()
+        defencefarm = true
+        defenceargs[1][1][3] = defence
+        repeat task.wait()
+            defenceargs[1][1][3] = defence
+            defence.Parent = client.Character
+            THEremote:FireServer(unpack(defenceargs))
+        until not defencefarm
+        defence.Parent = client.Backpack
+    end)
+end
+
+
+function gunfarmf()
+    task.spawn(function()
+        gunfarm = true
+        gunargs[1][1][5] = gun
+        repeat task.wait()
+            pcall(function()
+                gunargs[1][1][5] = gun
+                gun.Parent = client.Character
+                local target = getclosestmob()
+                gunargs[1][1][3][1] = target.NpcModel.HumanoidRootPart.Position
+                repeat task.wait()
+                    gunargs[1][1][5] = gun
+                    gun.Parent = client.Character
+                    local target = getclosestmob()
+                    gunargs[1][1][3][1] = target.NpcModel.HumanoidRootPart.Position
+                    THEremote:FireServer(unpack(gunargs))
+
+                until not gunfarm or not target:IsDescendantOf(workspace)
+            end)
+        until not gunfarm
+        gun.Parent = client.Backpack
+    end)
+end
+
+
+function autobusof()
+    task.spawn(function()
+        autobuso = true
+        repeat task.wait()
+            if not client.Character:GetAttribute('Buso') then
+                local args = {
+                    [1] = {
+                        [1] = {
+                            [1] = "\4",
+                            [2] = "BusoHaki"
+                        }
+                    }
+                }
+                THEremote:FireServer(unpack(args))                
+            end
+        until not autobuso
+    end)
+end
+
+function autokenf()
+    task.spawn(function()
+        autoken = true
+        repeat task.wait()
+            if not client.Character:GetAttribute('Ken') then
+                local args = {
+                    [1] = {
+                        [1] = {
+                            [1] = "\4",
+                            [2] = "KenHaki",
+                            [3] = "null",
+                            [4] = true
+                        }
+                    }
+                } 
+                THEremote:FireServer(unpack(args))                
+            end
+        until not autoken
+    end)
+end
+
+function autohaof()
+    autohao = true
+    task.spawn(function()
+        repeat task.wait()
+            pressKey('H')
+        until not autohao
+    end)
+end
+
+function autoskillf()
+    task.spawn(function()
+        autoskill = true
+        client.CharacterAdded:Connect(function()
+            task.wait(2)
+        end)
+        repeat task.wait()
+            for a, weapon in pairs(weaponsforskill) do
+                pcall(function()
+                    skillarg1[1][1][3] = weapon.Name
+                    skillarg2[1][1][3] = weapon.Name
+                    local target = getclosestmob()
+                    skillarg1[1][1][6] = target.NpcModel.HumanoidRootPart.Position
+                    skillarg2[1][1][6] = target.NpcModel.HumanoidRootPart.Position
+                    pcall(function()
+                    weapon.Parent = client.Character
+                    end)
+                    for b, skill in pairs(skills) do
+                        if table.find(skipc, weapon.Name) and skill == 'C' then else
+                            if table.find(skipc, weapon.Name) and skill == 'F' then else
+                                client.Character.Humanoid:EquipTool(weapon)
+                                pressKey(skill)
+                            end
+                        end
+                    end
+                    task.wait(0.3)
+                end)
+            end
+        until not autoskill
+        client.Character.Humanoid:UnequipTools()
+    end)
+end
+
+function levelfarmf()
+    task.spawn(function()
+        levelfarm = true
+        local bodyvelo = Instance.new('BodyVelocity')
+        bodyvelo.Velocity = Vector3.new(0, 0, 0)
+        bodyvelo.Parent = client.Character.HumanoidRootPart
+        repeat task.wait()
+            quest = getbestquest()
+            tp(quest:GetModelCFrame())
+            if isquestfinished() or client.leaderstats.Currents:GetAttribute('Quest') ~= quest:GetAttribute('QuestID') then
+                questarg[1][1][3] = quest:GetAttribute('QuestID')
+                repeat task.wait()
+                until quest:IsDescendantOf(workspace)
+                THEremote:FireServer(unpack(questarg))
+                task.wait(0.3)
+            end
+            repeat task.wait()
+                --pcall(function()
+                    for i, v in pairs(getisland():GetChildren()) do
+                        if tonumber(v.NpcConfiguration:GetAttribute('QuestId')) == client.leaderstats.Currents:GetAttribute('Quest') and v.NpcConfiguration:GetAttribute('Health') ~= 0 and not isquestfinished() then
+                            repeat task.wait()
+                                tp(v.NpcModel.HumanoidRootPart.CFrame * CFrame.new(0, v.NpcConfiguration:GetAttribute('Range') + 1, 0) * CFrame.Angles(math.rad(-90),0,0) )
+                            until v.NpcConfiguration:GetAttribute('Health') == 0 or not v:IsDescendantOf(workspace) or not levelfarm or isquestfinished()
+                        end
+                    end
+                --end)
+            until isquestfinished() or not levelfarm
+        until not levelfarm
+        bodyvelo.Parent = nil
+    end)
+end
+
+
+function tpsavedposf()
+    tpsavedpos = true
+    task.spawn(function()
+        repeat task.wait()
+            pcall(function()
+                tp(savedpos)
+            end)
+        until not tpsavedpos
+    end)
+end
+
+function infgeppof()
+    task.spawn(function()
+        infgeppo = true
+        repeat task.wait(1)
+            client.Character:SetAttribute('Geppos', math.huge)
+        until not infgeppo
+    end)
+end
+
+
+function seabeastfarmf()
+    seabeastfarm = true
+    task.spawn(function()
+        repeat task.wait(0.1)
+            pcall(function()
+                for i, v in pairs(workspace.__GAME.__Mobs.__SeaBeast:GetChildren()) do
+                    if isnpcalive(v) then
+                        repeat task.wait()
+                            tp(v.NpcModel.HumanoidRootPart.CFrame*CFrame.new(0, v.NpcConfiguration:GetAttribute('Range') + 1, 0))
+                        until not isnpcalive(v) or not seabeastfarm
+                    end
+                end
+            end)
+        until not seabeastfarm
+    end)
+end
+
+
+function autorandomfruitf()
+    autorandomfruit = true
+    task.spawn(function()
+        repeat task.wait(1)
+            THEremote:FireServer(unpack(rfruitarg))
+        until not autorandomfruit
+    end)
+end
+
+
+function autoroomf()
+    autoroom = true
+    repeat task.wait()
+        if fruit.Name == 'Ope' then
+            if workspace.Effects:FindFirstChild(client.Name..("Room")) then
+                room = workspace.Effects:FindFirstChild(client.Name..("Room"))
+                pcall(function()
+                    if (client.Character.HumanoidRootPart.Position - room.Room.Position).Magnitude > 240 then
+                        client.Character.Humanoid:EquipTool(fruit)
+                        client.Character.HumanoidRootPart.CFrame = client.Character.HumanoidRootPart.CFrame * CFrame.Angles(math.rad(-90),0,0)
+                        pressKey('F')
+                    end
+                end)
+            else
+                pcall(function()
+                    client.Character.Humanoid:EquipTool(fruit)
+                    pressKey('F')
+                end)
+            end
+        end
+    until not autoroom
+end
+
+
+
+-- ui lib
+
+local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/NatsuDevs/Linoria-Rewrite-Modded-/main/Lib.lua"))()
+
+local Window = Library:CreateWindow({
+    Title = 'one fruit simulator sea 2',
+    Center = true, 
+    AutoShow = true, 
+})
+local Tabs = {
+    ['Farm'] = Window:AddTab('Farm'), 
+    ['Teleport'] = Window:AddTab('Teleport'),
+    ['Utility'] = Window:AddTab('Utility'),
+    ['WebHooks'] = Window:AddTab('WebHooks'),
+    ['Misc'] = Window:AddTab('Misc')
+}
+
+-- MISC TAB (VITAL)
+
+local uileftgb = Tabs['Misc']:AddLeftGroupbox('Misc')
+uileftgb:AddButton('Rejoin', function() tpservice:TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer) end)
+uileftgb:AddButton('Unload Script', function() Library:Unload() end)
+uileftgb:AddButton('ServerHop (Lowest)', function() serverhop() end)
+
+-- FARMING TAB
+
+local babouche
+local farmingsettingsgb = Tabs['Farm']:AddLeftGroupbox('farm settings') 
+
+
+local meleeselector = farmingsettingsgb:AddDropdown('melee mode', {
+    Values = { 'None','fighting style', 'sword', 'fruit'},
+    Default = 1,
+    Multi = false,
+
+    Text = 'Choose m1 mode',
+    Tooltip = nil, 
+})
+
+local defencetoggle = farmingsettingsgb:AddToggle('auto defence', {
+    Text = 'autofarm defence', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local guntoggle = farmingsettingsgb:AddToggle('auto gun', {
+    Text = 'autofarm using gun', 
+    Default = false, 
+    Tooltip = 'kill nearst mob with gun',
+})
+
+
+local autobusohaki = farmingsettingsgb:AddToggle('auto buso', {
+    Text = 'auto activate buso haki', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local autokenhaki = farmingsettingsgb:AddToggle('auto ken', {
+    Text = 'auto activate ken haki', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local autohaotog = farmingsettingsgb:AddToggle('auto hao', {
+    Text = 'auto activate hao haki', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+
+local savepos = farmingsettingsgb:AddButton('Save Position', function() savedpos = CFrame.new(client.Character.HumanoidRootPart.Position) end)
+
+local autotpsavedpos = farmingsettingsgb:AddToggle('tp saved pos', {
+    Text = 'tp to saved position', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local skillgb = Tabs['Farm']:AddLeftGroupbox('skill selection') 
+
+local weaponselector = skillgb:AddDropdown('weapon selector', {
+    Values = {'fighting style', 'sword', 'fruit', 'gun'},
+    Default = 1,
+    Multi = true,
+
+    Text = 'Choose wich weapons',
+    Tooltip = nil, 
+})
+
+local skillselector = skillgb:AddDropdown('skills selector', {
+    Values = {'Z', 'X', 'C', 'V', 'B', 'F'},
+    Default = 1,
+    Multi = true,
+
+    Text = 'Choose wich skills',
+    Tooltip = nil, 
+})
+
+local autoskilltog = skillgb:AddToggle('auto skill', {
+    Text = 'auto use skills', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local autoroomtog = skillgb:AddToggle('auto room', {
+    Text = 'auto place ope room', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+
+local farminggb = Tabs['Farm']:AddLeftGroupbox('autofarm mode') 
+
+local levelfarmtog = farminggb:AddToggle('levelfarm', {
+    Text = 'auto quest + kill mobs', 
+    Default = false, 
+    Tooltip = 'use in combination with any farm method above',
+})
+
+local farminggb2 = Tabs['Farm']:AddLeftGroupbox('secondary farm') 
+
+local sbfarmtoggle = farminggb2:AddToggle('sea beast farm', {
+    Text = 'sea beast farm', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+
+meleeselector:OnChanged(function()
+    if meleeselector.Value == 'fighting style' then
+        combatfarmf()
+    elseif meleeselector.Value == 'sword' then
+        swordfarmf()
+    elseif meleeselector.Value == 'fruit' then
+        fruitfarmf()
+    elseif meleeselector.Value == 'None' then
+        combatfarm = falses
+        swordfarm = false
+        fruitfarm = false
+    end
+end)
+
+defencetoggle:OnChanged(function() 
+    if defencetoggle.Value then
+        defencefarmf()
+    else 
+        defencefarm = false
+    end
+end)
+
+
+guntoggle:OnChanged(function()
+    if guntoggle.Value then
+        gunfarmf()
+    else 
+        gunfarm = false
+    end
+end)
+
+levelfarmtog:OnChanged(function()
+    if levelfarmtog.Value then
+        levelfarmf()
+    else
+        levelfarm = false
+    end
+end)
+
+autobusohaki:OnChanged(function()
+    if autobusohaki.Value then
+        autobusof()
+    else
+        autobuso = false
+    end
+end)
+
+autokenhaki:OnChanged(function()
+    if autokenhaki.Value then
+        autokenf()
+    else
+        autoken = false
+    end
+end)
+
+autohaotog:OnChanged(function()
+    if autohaotog.Value then
+        autohaof()
+    else
+        autohao = false
+    end
+end)
+weaponselector:OnChanged(function()
+    weaponsforskill = {}
+    for i, v in pairs(weaponselector.Value) do
+        if i == 'fighting style' then
+            table.insert(weaponsforskill, 1, melee)
+        elseif i == 'sword' then
+            table.insert(weaponsforskill, 1, sword)
+        elseif i == 'fruit' then
+            table.insert(weaponsforskill, 1, fruit)
+        elseif i == 'gun' then
+            table.insert(weaponsforskill, 1, gun)
+        end
+    end
+end)
+
+skillselector:OnChanged(function()
+    skills = {}
+    for i, v in pairs(skillselector.Value) do
+        table.insert(skills, 1, i)
+    end
+end)
+
+autoroomtog:OnChanged(function()
+    if autoroomtog.Value then
+        autoroomf()
+    else
+        autoroom = false
+    end
+end)
+
+autoskilltog:OnChanged(function()
+    if autoskilltog.Value then
+        autoskillf()
+    else
+        autoskill = false
+    end
+end)
+
+autotpsavedpos:OnChanged(function()
+    if autotpsavedpos.Value then
+        tpsavedposf()
+    else
+        tpsavedpos = false
+    end
+end)
+
+sbfarmtoggle:OnChanged(function() 
+    if sbfarmtoggle.Value then
+        seabeastfarmf()
+    else 
+        seabeastfarm = false
+    end
+end)
+
+
+-- TELEPORT TAB
+
+local teleportgb = Tabs['Teleport']:AddLeftGroupbox('Teleport')
+for i, v in pairs(workspace.__GAME.__SpawnLocations:GetChildren()) do
+    teleportgb:AddButton(v:GetAttribute('IslandName'), function() tp(CFrame.new(v.Position)) end)
+end
+
+local worlgb = Tabs['Teleport']:AddLeftGroupbox('world changer')
+
+worlgb:AddButton('sea 1', function() THEremote:FireServer(unpack(sea1arg)) end)
+
+-- UTILITY TAB
+
+local utilitygb = Tabs['Utility']:AddLeftGroupbox('Utility')
+
+utilitygb:AddButton('unlock geppo', function() client.leaderstats:SetAttribute('Geppo', true) end)
+
+local geppotoggle = utilitygb:AddToggle('infinite geppo', {
+    Text = 'infinte geppo', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local rfruittog = utilitygb:AddToggle('rfruit', {
+    Text = 'auto random fruit', 
+    Default = false, 
+    Tooltip = nil,
+})
+
+local localplayergb = Tabs['Utility']:AddLeftGroupbox('LocalPlayer')
+
+local walkspeed = localplayergb:AddSlider('WalkSpeed', {
+    Text = 'WalkSpeed Changer',
+    Default = 42,
+    Min = 1,
+    Max = 200,
+    Rounding = 1,
+    Compact = false,
+})
+
+geppotoggle:OnChanged(function()
+    if geppotoggle.Value then
+        infgeppof()
+    else 
+        infgeppo = false
+    end
+end)
+
+rfruittog:OnChanged(function()
+    if rfruittog.Value then
+        autorandomfruitf()
+    else 
+        autorandomfruit = false
+    end
+end)
+
+task.spawn(function()
+    while task.wait() do
+        pcall(function()
+            client.Character.Humanoid.WalkSpeed = walkspeed.Value
+        end)
+    end
+end)
+
+local webhookentrygb = Tabs['WebHooks']:AddLeftGroupbox('WebHooks Enter')
+
+local invloggerwh = webhookentrygb:AddInput('inventorylogger', {
+    Default = nil,
+    Numeric = false, 
+    Finished = true, 
+
+    Text = 'type your inventory logger webhook',
+    Tooltip = 'if you get an item it will send a message to your webhook',
+
+    Placeholder = 'type your webhook', 
+})
+
+invloggerwh:OnChanged(function()
+    invloggerwebhook = invloggerwh.Value
+end)
