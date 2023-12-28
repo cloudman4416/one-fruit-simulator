@@ -678,15 +678,15 @@ function autoskillf()
         end)
         repeat task.wait()
             for a, weapon in pairs(weaponsforskill) do
-                pcall(function()
+                --pcall(function()
                     skillarg1[1][1][3] = weapon.Name
                     skillarg2[1][1][3] = weapon.Name
                     local target = getclosestmob()
                     skillarg1[1][1][6] = target.NpcModel.HumanoidRootPart.Position
                     skillarg2[1][1][6] = target.NpcModel.HumanoidRootPart.Position
-                    pcall(function()
+                    --pcall(function()
                     weapon.Parent = client.Character
-                    end)
+                    --end)
                     for b, skill in pairs(skills) do
                         if table.find(skipc, weapon.Name) and skill == 'C' then else
                             if table.find(skipc, weapon.Name) and skill == 'F' then else
@@ -696,7 +696,7 @@ function autoskillf()
                         end
                     end
                     task.wait(0.3)
-                end)
+                --end)
             end
         until not autoskill
         client.Character.Humanoid:UnequipTools()
