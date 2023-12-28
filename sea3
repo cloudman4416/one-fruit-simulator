@@ -327,112 +327,58 @@ end
 function getbestquest()
     local questid
     local questdude
-    if level < 600 then
-        questid = 'Quest29'
-    elseif level < 640 then
-        questid = 'Quest30'
-    elseif level < 680 then
-        questid = 'Quest31'
-    elseif level < 720 then
-        questid = 'Quest32'
-    elseif level < 750 then
-        questid = 'Quest33'
-    elseif level < 800 then
-        questid = 'Quest34'
-    elseif level < 840 then
-        questid = 'Quest35'
-    elseif level < 900 then
-        questid = 'Quest36'
-    elseif level < 950 then
-        questid = 'Quest37'
-    elseif level < 1000 then
-        questid = 'Quest38'
-    elseif level < 1060 then
-        questid = 'Quest39'
-    elseif level < 1100 then
-        questid = 'Quest40'
-    elseif level < 1150 then
-        questid = 'Quest41'
-    elseif level < 1200 then
-        questid = 'Quest42'
-    elseif level < 1350 then
-        questid = 'Quest43'
-    elseif level < 1425 then
-        questid = 'Quest44'
-    elseif level < 1500 then
-        questid = 'Quest45'
-    elseif level < 1575 then
-        questid = 'Quest46'
-    elseif level < 1650 then
-        questid = 'Quest47'
-    elseif level < 1725 then
-        questid = 'Quest48'
-    elseif level < 1800 then
-        questid = 'Quest49'
-    elseif level < 1900 then
-        questid = 'Quest50'
-    elseif level < 2000 then
-        questid = 'Quest51'
-    elseif level < 2100 then
-        questid = 'Quest52'
-    elseif level < 2200 then
-        questid = 'Quest53'
-    elseif level < 2300 then
-        questid = 'Quest54'
-    elseif level < 2400 then
-        questid = 'Quest55'
-    elseif level < 2500 then
-        questid = 'Quest56'
-    elseif level < 2600 then
-        questid = 'Quest57'
-    elseif level < 2800 then
-        questid = 'Quest58'
-    elseif level < 2975 then
-        questid = 'Quest59'
-    elseif level < 3100 then
-        questid = 'Quest60'
-    elseif level < 3225 then
-        questid = 'Quest61'
-    elseif level < 3350 then
-        questid = 'Quest62'
-    elseif level < 3500 then
-        questid = 'Quest63'
-    elseif level < 3600 then
-        questid = 'Quest64'
-    elseif level < 3800 then
-        questid = 'Quest65'
-    elseif level < 4000 then
-        questid = 'Quest66'
-    elseif level < 4200 then
-        questid = 'Quest67'
-    elseif level < 4450 then
-        questid = 'Quest68'
-    elseif level < 4750 then
-        questid = 'Quest69'
-    elseif level < 5000 then
-        questid = 'Quest70'
-    elseif level < 5250 then
-        questid = 'Quest71'
-    elseif level < 5500 then
-        questid = 'Quest72'
-    elseif level < 5750 then
-        questid = 'Quest73'
-    elseif level < 6000 then
-        questid = 'Quest74'
-    elseif level < 6250 then
-        questid = 'Quest75'
-    elseif level < 6500 then
-        questid = 'Quest76'
-    elseif level < 6800 then
-        questid = 'Quest77'
-    elseif level < 7000 then
-        questid = 'Quest78'
-    elseif level < 7350 then
-        questid = 'Quest79'
-    elseif level < 7700 then
-        questid = 'Quest80'
+    if level < 8250 then
+        questid = 'Quest82'
+    elseif level < 8500 then
+        questid = 'Quest83'
+    elseif level < 9000 then
+        questid = 'Quest84'
+    elseif level < 9250 then
+        questid = 'Quest85'
+    elseif level < 9500 then
+        questid = 'Quest86'
+    elseif level < 9750 then
+        questid = 'Quest87'
+    elseif level < 10000 then
+        questid = 'Quest88'
+    elseif level < 10250 then
+        questid = 'Quest89'
+    elseif level < 10500 then
+        questid = 'Quest90'
+    elseif level < 10750 then
+        questid = 'Quest91'
+    elseif level < 11000 then
+        questid = 'Quest92'
+    elseif level < 11500 then
+        questid = 'Quest93'
+    elseif level < 12000 then
+        questid = 'Quest94'
+    elseif level < 12500 then
+        questid = 'Quest95'
+    elseif level < 12750 then
+        questid = 'Quest96'
+    elseif level < 13000 then
+        questid = 'Quest97'
+    elseif level < 13250 then
+        questid = 'Quest98'
+    elseif level < 13500 then
+        questid = 'Quest99'
+    elseif level < 14000 then
+        questid = 'Quest100'
+    elseif level < 14500 then
+        questid = 'Quest101'
+    elseif level < 15000 then
+        questid = 'Quest102'
+    elseif level < 15750 then
+        questid = 'Quest103'
+    elseif level < 16500 then
+        questid = 'Quest104'
+    elseif level < 17000 then
+        questid = 'Quest105'
+    elseif level < 17500 then
+        questid = 'Quest106'
     else 
-        questid = 'Quest81'
+        questid = 'Quest107'
     end
     questdude = questfile:FindFirstChild(questid)
     if questdude == nil then
@@ -863,7 +809,7 @@ function autoroomf()
 end
 
 
---[[
+
 -- ui lib
 
 local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
@@ -1193,7 +1139,3 @@ local invloggerwh = webhookentrygb:AddInput('inventorylogger', {
 invloggerwh:OnChanged(function()
     invloggerwebhook = invloggerwh.Value
 end)
-
-]]--
-
-fruitfarmf()
