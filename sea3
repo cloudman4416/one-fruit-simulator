@@ -1137,3 +1137,4 @@ local invloggerwh = webhookentrygb:AddInput('inventorylogger', {
 invloggerwh:OnChanged(function()
     invloggerwebhook = invloggerwh.Value
 end)
+ 
